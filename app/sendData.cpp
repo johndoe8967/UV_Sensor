@@ -14,6 +14,7 @@
 #include "../include/sendData.h"
 #include <SmingCore/Debug.h>
 
+//#define debug
 
 #define useThingSpeak
 #ifdef useThingSpeak
@@ -27,12 +28,14 @@ String url;
 
 void onDataSent(HttpClient& client, bool successful)
 {
+#ifdef debug
 	if (successful)
 		Debug.printf("Success sent\r\n");
 	else
 		Debug.printf("Failed\r\n");
 
 	Debug.printf("Server response: '%s'\r\n",client.getResponseString().c_str());
+#endif
 }
 
 
@@ -43,16 +46,21 @@ void sendThingSpeak () {
 #endif
 
 void sendData(uint value, float avgValue, bool send) {
-
+#ifdef debug
 	Debug.printf ("value: %d avgValue: %d Time: %s\r\n", value, avgValue, SystemClock.now(eTZ_UTC).toISO8601().c_str());
+#endif
 
 	if (send) {
 #ifdef useThingSpeak
 		if (thingSpeak.isProcessing()) {
+#ifdef debug
 			Debug.print("!!!!ThingSpeak not ready -> close");
+#endif
 			thingSpeak.reset();
 		} else {
+#ifdef debug
 			Debug.print("Send ThingSpeak\r\n");
+#endif
 			url = ThingSpeakHost;
 			url += "/update?key=";
 			url += APIKEY;
@@ -62,8 +70,6 @@ void sendData(uint value, float avgValue, bool send) {
 			url += avgValue;
 			url += "&field3=";
 			url += WifiStation.getRssi();
-			url += "&created_at=";
-			url += SystemClock.now(eTZ_UTC).toISO8601();
 			thingSpeak.downloadString(url, onDataSent);
 		}
 #endif
