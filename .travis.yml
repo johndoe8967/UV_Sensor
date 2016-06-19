@@ -1,7 +1,6 @@
 sudo: false
 language: cpp
 os:
-  - linux
   - osx
 env:
   global:
