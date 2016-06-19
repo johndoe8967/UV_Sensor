@@ -13,6 +13,7 @@
  */
 #include "../include/sendData.h"
 #include <SmingCore/Debug.h>
+#include "credentials.h"
 
 //#define debug
 
@@ -20,7 +21,6 @@
 #ifdef useThingSpeak
 String ThingSpeakHost = "http://api.thingspeak.com";  // no need to change this
 HttpClient thingSpeak;
-#define APIKEY "--";
 #endif
 
 

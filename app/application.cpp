@@ -9,12 +9,7 @@
 #include "VEML6070.h"
 #include "webserver.h"
 #include "sendData.h"
-
-// If you want, you can define WiFi settings globally in Eclipse Environment Variables
-#ifndef WIFI_SSID
-	#define WIFI_SSID "PleaseEnterSSID" // Put you SSID and Password here
-	#define WIFI_PWD "PleaseEnterPass"
-#endif
+#include "credentials.h"
 
 
 VEML6070 *uvSensor;
