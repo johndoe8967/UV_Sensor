@@ -6,21 +6,14 @@
  */
 
 #include "VEML6070.h"
-/*
-VEML6070::VEML6070() {
-	value = 0;
-	Wire.beginTransmission(CMDAddress);
-	Wire.write(time<<2 | 0x02);
-	byte error = Wire.endTransmission();
-	getCalcRefreshTime();
-	if (error == 0) {
-		init = true;
-	}
-}*/
 
-VEML6070::VEML6070(VEML6070Delegate newCallbackTimer) {
-	callbackTimer = newCallbackTimer;
-	value = 0;
+VEML6070::VEML6070(VEML6070Delegate newCallbackTimer,uint newRSet, char newTime)
+			: callbackTimer(newCallbackTimer),
+			  value (0),
+			  time(newTime),
+			  rSet(newRSet),
+			  init(false)
+{
 	Wire.beginTransmission(CMDAddress);
 	Wire.write(time<<2 | 0x02);
 	byte error = Wire.endTransmission();
@@ -28,6 +21,12 @@ VEML6070::VEML6070(VEML6070Delegate newCallbackTimer) {
 	if (error == 0) {
 		init = true;
 	}
+}
+VEML6070::VEML6070(uint newRSet, char newTime)
+			: VEML6070(nullptr,newRSet,newTime) {
+}
+
+VEML6070::VEML6070() : VEML6070(nullptr) {
 }
 
 
