@@ -18,10 +18,10 @@
 
 VEML6070 *uvSensor;
 
-void readUV(uint newValue)
+void readUV(uint newValue, float avgValue)
 {
-  debugf("uv value: %d \n\r",newValue);
-  sendMeasureToClients(newValue);
+  debugf("uv value: %d; %f\n\r",newValue, avgValue);
+  sendMeasureToClients(newValue, avgValue);
 }
 
 // Will be called when WiFi station was connected to AP
@@ -46,6 +46,7 @@ void init()
 	uvSensor = new VEML6070(VEML6070Delegate(&readUV));
 	uvSensor->setRsetValue(300);
 	uvSensor->setIntegrationTime(1);
+	uvSensor->setAlpha(0.3);
 
 	WifiStation.enable(true);
 	WifiStation.config(WIFI_SSID, WIFI_PWD);

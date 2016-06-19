@@ -65,9 +65,9 @@ void wsDisconnected(WebSocket& socket)
 		clients[i].sendString("{\"type\": \"JSON\", \"msg\": \"We lost our friend :(\", \"value\": " + String(totalActiveSockets) + "}");
 }
 
-void sendMeasureToClients(uint value) {
+void sendMeasureToClients(uint value, float avgValue) {
 	for (int i = 0; i < clients.count(); i++)
-		clients[i].sendString("{\"type\": \"JSON\", \"msg\": \"UVValue\", \"value\": " + String(value) + "}");
+		clients[i].sendString("{\"type\": \"JSON\", \"msg\": \"UVValue\", \"value\": " + String(value) +", \"avgValue\": " + String(avgValue) + "}");
 }
 
 void startWebServer()

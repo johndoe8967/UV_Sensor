@@ -10,6 +10,8 @@
 VEML6070::VEML6070(VEML6070Delegate newCallbackTimer,uint newRSet, char newTime)
 			: callbackTimer(newCallbackTimer),
 			  value (0),
+			  avgValue(0.0),
+			  alpha(1),
 			  refreshTime(newTime),
 			  reduction(1),
 			  count(0),
@@ -46,8 +48,9 @@ void VEML6070::read() {
 	if (Wire.available()) {
 		value |= Wire.read();
 	}
+	avgValue = avgValue*(1-alpha) + (float)value*alpha;
 	if ((callbackTimer)&&((count%reduction)==0)) {
-		callbackTimer(value);
+		callbackTimer(value,avgValue);
 	}
 }
 

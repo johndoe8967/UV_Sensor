@@ -16,7 +16,7 @@
 #define LSBAddress 0x38
 #define MSBAddress 0x40
 
-typedef Delegate<void(uint value)> VEML6070Delegate;
+typedef Delegate<void(uint value, float avgValue)> VEML6070Delegate;
 
 class VEML6070 {
 public:
@@ -30,12 +30,23 @@ public:
 	bool setReduction(char newReduction);
 	void setRsetValue(uint newValue);
 
-	unsigned int getValue() const {return value;};
+	unsigned int getValue() const {
+		return value;
+	}
+	float getAlpha() const { return alpha; }
+
+	void setAlpha(float alpha) {
+		if ((alpha > 0) && (alpha <=1)) this->alpha = alpha;
+	}
+
+	;
 
 private:
 	void read();
 	uint getCalcRefreshTime();
 	unsigned int value;
+	float avgValue;
+	float alpha;
 	char refreshTime;
 	char reduction;
 	char count;

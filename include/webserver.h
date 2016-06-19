@@ -11,7 +11,7 @@
 
 
 void startWebServer();
-void sendMeasureToClients(uint value);
+void sendMeasureToClients(uint value, float avgValue);
 
 
 #endif /* INCLUDE_WEBSERVER_H_ */

@@ -24,7 +24,8 @@ function drawChart() {
   data = new google.visualization.DataTable();
   data.addColumn('string','Time');
   data.addColumn('number', 'UV Value');
-  data.addRow(['1',2]);
+  data.addColumn('number', 'avg UV Value');
+  data.addRow(['1',0,0]);
   options = {'title':'UV Chart',
                  'width':900,
                  'height':500};
@@ -68,7 +69,7 @@ function drawChart() {
     switch(msg.type) {
     case "JSON":
     	if ((loaded==1)&&(msg.msg=="UVValue")) {
-      	  data.addRow( [ data.getNumberOfRows().toString() , msg.value] );
+      	  data.addRow( [ data.getNumberOfRows().toString() , msg.value, msg.avgValue] );
     	  chart.draw(data);    		
     	}
       break;
