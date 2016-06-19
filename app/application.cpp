@@ -8,6 +8,7 @@
 #include <SmingCore/SmingCore.h>
 #include "VEML6070.h"
 #include "webserver.h"
+#include "sendData.h"
 
 // If you want, you can define WiFi settings globally in Eclipse Environment Variables
 #ifndef WIFI_SSID
@@ -18,10 +19,15 @@
 
 VEML6070 *uvSensor;
 
+char count=0;
 void readUV(uint newValue, float avgValue)
 {
   debugf("uv value: %d; %f\n\r",newValue, avgValue);
   sendMeasureToClients(newValue, avgValue);
+  if (count++ >= 15) {
+	  sendData(newValue, avgValue, true);
+	  count = 0;
+  }
 }
 
 // Will be called when WiFi station was connected to AP
@@ -46,6 +52,7 @@ void init()
 	uvSensor = new VEML6070(VEML6070Delegate(&readUV));
 	uvSensor->setRsetValue(300);
 	uvSensor->setIntegrationTime(1);
+	uvSensor->setReduction(8);
 	uvSensor->setAlpha(0.3);
 
 	WifiStation.enable(true);
