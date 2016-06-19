@@ -1,5 +1,8 @@
 /*
  * VEML6070.h
+ *	Implementation of a VEML6070 UV light I2C sensor
+ *	the class will perform autonomous measurements according to the timing of the sensor
+ *	values can be read by function or obtained by delegation
  *
  *  Created on: 10.06.2016
  *      Author: johndoe
@@ -24,6 +27,7 @@ public:
 	virtual ~VEML6070();
 
 	bool setIntegrationTime(char time);
+	bool setReduction(char newReduction);
 	void setRsetValue(uint newValue);
 
 	unsigned int getValue() const {return value;};
@@ -32,7 +36,9 @@ private:
 	void read();
 	uint getCalcRefreshTime();
 	unsigned int value;
-	char time;
+	char refreshTime;
+	char reduction;
+	char count;
 	uint rSet;
 	bool init;
 	Timer readTimer;

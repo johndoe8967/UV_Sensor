@@ -10,12 +10,14 @@
 VEML6070::VEML6070(VEML6070Delegate newCallbackTimer,uint newRSet, char newTime)
 			: callbackTimer(newCallbackTimer),
 			  value (0),
-			  time(newTime),
+			  refreshTime(newTime),
+			  reduction(1),
+			  count(0),
 			  rSet(newRSet),
 			  init(false)
 {
 	Wire.beginTransmission(CMDAddress);
-	Wire.write(time<<2 | 0x02);
+	Wire.write(refreshTime<<2 | 0x02);
 	byte error = Wire.endTransmission();
 	getCalcRefreshTime();
 	if (error == 0) {
@@ -44,14 +46,17 @@ void VEML6070::read() {
 	if (Wire.available()) {
 		value |= Wire.read();
 	}
-	if (callbackTimer) {
+	if ((callbackTimer)&&((count%reduction)==0)) {
 		callbackTimer(value);
 	}
 }
 
+bool VEML6070::setReduction(char newReduction) {
+	if (newReduction > 0) reduction = newReduction;
+}
 
 uint VEML6070::getCalcRefreshTime() {
-	unsigned int refreshtime = rSet*125/600<<time;
+	unsigned int refreshtime = rSet*125/600<<refreshTime;
 	readTimer.initializeMs(refreshtime,TimerDelegate(&VEML6070::read,this)).start();
 	return refreshtime;
 }
@@ -65,9 +70,9 @@ void VEML6070::setRsetValue(uint newValue) {
 
 bool VEML6070::setIntegrationTime(char newTime) {
 	if ((newTime < 0) || (newTime > 3)) return false;
-	time = newTime;
+	refreshTime = newTime;
 	Wire.beginTransmission(CMDAddress);
-	Wire.write(time<<2 | 0x02);
+	Wire.write(refreshTime<<2 | 0x02);
 	byte error = Wire.endTransmission();
 	getCalcRefreshTime();
 	return (error == 0);
