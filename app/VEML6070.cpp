@@ -7,6 +7,8 @@
 
 #include "VEML6070.h"
 
+//#define debug
+
 VEML6070::VEML6070(VEML6070Delegate newCallbackTimer,uint newRSet, char newTime)
 			: callbackTimer(newCallbackTimer),
 			  value (0),
@@ -24,6 +26,9 @@ VEML6070::VEML6070(VEML6070Delegate newCallbackTimer,uint newRSet, char newTime)
 	getCalcRefreshTime();
 	if (error == 0) {
 		init = true;
+#ifdef debug
+		debugf("VEML6070 init\n");
+#endif
 	}
 }
 VEML6070::VEML6070(uint newRSet, char newTime)
@@ -39,16 +44,30 @@ VEML6070::~VEML6070() {
 
 
 void VEML6070::read() {
-	Wire.requestFrom(MSBAddress,1);
+	uint8_t ret;
+	ret = Wire.requestFrom(MSBAddress,1);
+#ifdef debug
+	debugf("VEML6070 MSB: %x",ret);
+#endif
 	if (Wire.available()) {
 		value = Wire.read();
+#ifdef debug
+		debugf("VEML6070 read MSB");
+#endif
 	}
 	value <<= 8;
-	Wire.requestFrom(LSBAddress,1);
+	ret = Wire.requestFrom(LSBAddress,1);
+#ifdef debug
+	debugf("VEML6070LSB: %x",ret);
+#endif
 	if (Wire.available()) {
 		value |= Wire.read();
+#ifdef debug
+		debugf("VEML6070 read LSB");
+#endif
 	}
 	avgValue = avgValue*(1-alpha) + (float)value*alpha;
+	count++;
 	if ((callbackTimer)&&((count%reduction)==0)) {
 		callbackTimer(value,avgValue);
 	}

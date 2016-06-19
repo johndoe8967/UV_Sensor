@@ -14,7 +14,7 @@
 
 #define CMDAddress 0x38
 #define LSBAddress 0x38
-#define MSBAddress 0x40
+#define MSBAddress 0x39
 
 typedef Delegate<void(uint value, float avgValue)> VEML6070Delegate;
 
