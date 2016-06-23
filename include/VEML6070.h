@@ -12,11 +12,10 @@
 #define APP_VEML6070_H_
 #include <SmingCore/SmingCore.h>
 
-#define CMDAddress 0x38
-#define LSBAddress 0x38
-#define MSBAddress 0x39
+#define UVIk 0.005353733
+#define UVId -0.997052
 
-typedef Delegate<void(uint value, float avgValue)> VEML6070Delegate;
+typedef Delegate<void(uint value, float avgValue, float UVI, float E)> VEML6070Delegate;
 
 class VEML6070 {
 public:
@@ -30,8 +29,22 @@ public:
 	bool setReduction(char newReduction);
 	void setRsetValue(uint newValue);
 
-	unsigned int getValue() const {
+	uint getValue() const {
 		return value;
+	}
+
+	float getAvgValue() const {
+		return avgValue;
+	}
+
+	float getUVI() const {
+		auto UVI = ((float)value/(1<<refreshTime))*UVIk+UVId;
+		if (UVI < 0) UVI = 0;
+		return UVI;
+	}
+
+	float getEnergy() const {
+		return getUVI()*0.025;
 	}
 	float getAlpha() const { return alpha; }
 

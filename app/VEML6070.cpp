@@ -7,6 +7,9 @@
 
 #include "VEML6070.h"
 
+#define CMDAddress 0x38
+#define LSBAddress 0x38
+#define MSBAddress 0x39
 //#define debug
 
 VEML6070::VEML6070(VEML6070Delegate newCallbackTimer,uint newRSet, char newTime)
@@ -69,7 +72,7 @@ void VEML6070::read() {
 	avgValue = avgValue*(1-alpha) + (float)value*alpha;
 	count++;
 	if ((callbackTimer)&&((count%reduction)==0)) {
-		callbackTimer(value,avgValue);
+		callbackTimer(this->getValue(),this->getAvgValue(), this->getUVI(), this->getEnergy());
 	}
 }
 
