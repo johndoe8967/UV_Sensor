@@ -10,7 +10,7 @@
 #include <SmingCore/SmingCore.h>
 
 
-void sendData(uint value, float avgValue, bool send);
+void sendData(uint value, float avgValue, float UVI, float energy, bool send);
 
 
 

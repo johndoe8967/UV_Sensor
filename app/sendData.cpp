@@ -45,7 +45,7 @@ void sendThingSpeak () {
 }
 #endif
 
-void sendData(uint value, float avgValue, bool send) {
+void sendData(uint value, float avgValue, float actUVI, float actEnergy, bool send) {
 #ifdef debug
 	Debug.printf ("value: %d avgValue: %d Time: %s\r\n", value, avgValue, SystemClock.now(eTZ_UTC).toISO8601().c_str());
 #endif
@@ -70,6 +70,10 @@ void sendData(uint value, float avgValue, bool send) {
 			url += avgValue;
 			url += "&field3=";
 			url += WifiStation.getRssi();
+			url += "&field4=";
+			url += actUVI;
+			url += "&field5=";
+			url += actEnergy;
 			thingSpeak.downloadString(url, onDataSent);
 		}
 #endif

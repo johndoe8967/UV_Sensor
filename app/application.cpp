@@ -18,15 +18,19 @@ Timer sendDelay;
 char count=0;
 uint actValue;
 float actAvgValue;
+float actUVI;
+float actEnergy;
 
 void send() {
-	sendData(actValue, actAvgValue, true);
+	sendData(actValue, actAvgValue, actUVI, actEnergy, true);
 }
 
-void readUV(uint newValue, float avgValue)
+void readUV(uint newValue, float avgValue, float UVI, float energy)
 {
 	actValue=newValue;
 	actAvgValue=avgValue;
+	actUVI = UVI;
+	actEnergy = energy;
 	sendMeasureToClients(newValue, avgValue);
 	if (count++ >= 15) {
 		sendDelay.startOnce();
@@ -59,7 +63,7 @@ void init()
 	uvSensor->setRsetValue(270);
 	uvSensor->setIntegrationTime(1);
 	uvSensor->setReduction(8);
-	uvSensor->setAlpha(0.3);
+	uvSensor->setAlpha(0.1);
 
 	WifiStation.enable(true);
 	WifiStation.config(WIFISSID, WIFIPWD);
