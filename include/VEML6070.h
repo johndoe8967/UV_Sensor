@@ -38,7 +38,9 @@ public:
 	}
 
 	float getUVI() const {
-		auto UVI = ((float)value/(1<<refreshTime))*UVIk+UVId;
+		float integrationFactor = (1<<refreshTime);
+		integrationFactor /= 2;
+		float UVI = ((float)value/integrationFactor)*UVIk+UVId;
 		if (UVI < 0) UVI = 0;
 		return UVI;
 	}
@@ -57,7 +59,7 @@ public:
 private:
 	void read();
 	uint getCalcRefreshTime();
-	unsigned int value;
+	uint value;
 	float avgValue;
 	float alpha;
 	char refreshTime;
