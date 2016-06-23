@@ -32,7 +32,7 @@ void readUV(uint newValue, float avgValue, float UVI, float energy)
 	actUVI = UVI;
 	actEnergy = energy;
 	sendMeasureToClients(newValue, avgValue);
-	if (count++ >= 15) {
+	if (count++ >= 20) {
 		sendDelay.startOnce();
 		count = 0;
 	}
