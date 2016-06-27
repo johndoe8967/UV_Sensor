@@ -46,7 +46,7 @@ public:
 	}
 
 	float getEnergy() const {
-		return getUVI()*0.025;
+		return getUVI()*25;
 	}
 	float getAlpha() const { return alpha; }
 
