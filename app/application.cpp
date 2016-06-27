@@ -61,7 +61,7 @@ void init()
 	Wire.begin();
 	uvSensor = new VEML6070(VEML6070Delegate(&readUV));
 	uvSensor->setRsetValue(270);
-	uvSensor->setIntegrationTime(1);
+	uvSensor->setIntegrationTime(3);
 	uvSensor->setReduction(8);
 	uvSensor->setAlpha(0.1);
 
