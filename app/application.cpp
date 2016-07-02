@@ -28,6 +28,8 @@ struct RTCMemMap {
 
 RTCMemMap rtcMemory;
 
+uint32 rtcCalib;
+
 String ThingSpeakHost = "http://api.thingspeak.com";  // no need to change this
 HttpClient thingSpeak;
 String url;
@@ -36,7 +38,7 @@ void sleep() {
 	SET_PERI_REG_MASK(UART_CONF0(0), UART_TXFIFO_RST);//RESET FIFO
 	CLEAR_PERI_REG_MASK(UART_CONF0(0), UART_TXFIFO_RST);
 	system_deep_sleep_set_option(2);
-	system_deep_sleep(30000000);
+	system_deep_sleep(10*1000000);
 }
 
 void onDataSent(HttpClient& client, bool successful)
@@ -81,7 +83,7 @@ void sendData() {
 
 void sendDelay() {
 	if (WifiStation.isConnected()) {
-		sendDelayTimer.initializeMs(100,TimerDelegate(&sendData)).startOnce();
+		sendDelayTimer.initializeMs(10,TimerDelegate(&sendData)).startOnce();
 	} else {
 		sendDelayTimer.initializeMs(100,TimerDelegate(&sendDelay)).startOnce();
 	}
@@ -90,7 +92,8 @@ void sendDelay() {
 
 void readUV(uint newValue, float avgValue, float UVI, float energy)
 {
-
+	Serial.print("measure: ");
+	Serial.println(newValue);
 	rtcMemory.count++;
 	if (rtcMemory.count > 6) rtcMemory.count=0;
 	rtcMemory.value[rtcMemory.count] = newValue;
@@ -99,8 +102,14 @@ void readUV(uint newValue, float avgValue, float UVI, float energy)
 	actEnergy = energy;
 
 	system_rtc_mem_write(64,&rtcMemory,sizeof(RTCMemMap));
-	if (measureOnly) sleep();
-	else sendDelay();
+	if (measureOnly) {
+		sleep();
+	}
+	else {
+		uvSensor->setDelegate(nullptr);
+		uvSensor->stop();
+		sendDelay();
+	}
 }
 
 void init()
@@ -112,6 +121,8 @@ void init()
 
 	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
 	Serial.systemDebugOutput(false); // Disable debug output
+	rtcCalib = system_rtc_clock_cali_proc();
+	Serial.println(system_get_rtc_time()/1000*rtcCalib);
 
 	// You can change pins:
 	Wire.pins(2, 0); // SCL, SDA
@@ -134,10 +145,12 @@ void init()
 	}
 
 	if (rtcMemory.count == 6) {
+		Serial.println("Send to Thingspeak");
 		WifiStation.config(WIFISSID,WIFIPWD,false);
 		WifiStation.enable(true);
 		measureOnly = false;
 	} else {
+		Serial.println("Measure Only");
 		measureOnly = true;
 	}
 }
