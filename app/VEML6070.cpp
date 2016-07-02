@@ -103,3 +103,16 @@ bool VEML6070::setIntegrationTime(char newTime) {
 	return (error == 0);
 }
 
+void VEML6070::setDelegate(VEML6070Delegate newDelegate){
+	callbackTimer = newDelegate;
+}
+
+bool VEML6070::start() {
+	readTimer.start();
+	return readTimer.isStarted();
+}
+
+bool VEML6070::stop() {
+	readTimer.stop();
+	return !readTimer.isStarted();
+}

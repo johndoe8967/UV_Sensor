@@ -28,6 +28,9 @@ public:
 	bool setIntegrationTime(char time);
 	bool setReduction(char newReduction);
 	void setRsetValue(uint newValue);
+	void setDelegate(VEML6070Delegate newCallbackTimer);
+	bool start();
+	bool stop();
 
 	uint getValue() const {
 		return value;
