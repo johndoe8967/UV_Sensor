@@ -10,6 +10,7 @@
 #define CMDAddress 0x38
 #define LSBAddress 0x38
 #define MSBAddress 0x39
+#define ARAAddress 0x18
 //#define debug
 
 VEML6070::VEML6070(VEML6070Delegate newCallbackTimer,uint newRSet, char newTime)
@@ -23,6 +24,11 @@ VEML6070::VEML6070(VEML6070Delegate newCallbackTimer,uint newRSet, char newTime)
 			  rSet(newRSet),
 			  init(false)
 {
+	Wire.requestFrom(ARAAddress,1);
+	if (Wire.available()) {
+		value = Wire.read();
+	}
+
 	Wire.beginTransmission(CMDAddress);
 	Wire.write(refreshTime<<2 | 0x02);
 	byte error = Wire.endTransmission();
