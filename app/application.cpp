@@ -269,8 +269,10 @@ void init()
 	WifiStation.enable(false);
 
 	Serial.begin(SERIAL_BAUD_RATE); // 115200 by default
-	Serial.systemDebugOutput(false); // Disable debug output
+	Serial.systemDebugOutput(true); // Disable debug output
 	rtcCalib = system_rtc_clock_cali_proc();
+
+	debugf("Hello UVSensor");
 
 	Wire.pins(2, 0); // SCL, SDA
 
@@ -283,6 +285,7 @@ void init()
 
 	rst_info *info = system_get_rst_info();
 	if (info->reason == REASON_DEEP_SLEEP_AWAKE) {
+		debugf("Reset from DeepSleep");
 		system_rtc_mem_read(64,&rtcMemory,sizeof(RTCMemMap));
 		if (rtcMemory.count > 6) {
 			memset(&rtcMemory,0,sizeof(RTCMemMap));
