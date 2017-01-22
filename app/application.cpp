@@ -10,8 +10,10 @@
 #include "credentials.h"
 #include <user_interface.h>
 
+//#define noSleep
 //#define debug
 //#define USE_MQTT
+#define USE_THINGSPEAK
 #define LED_PIN 2 // GPIO2
 bool blinkState = true;
 
@@ -37,9 +39,11 @@ RTCMemMap rtcMemory;
 
 uint32 rtcCalib;
 
+#ifdef USE_THINGSPEAK
 String ThingSpeakHost = "http://api.thingspeak.com";  // no need to change this
 HttpClient thingSpeak;
 bool thingSpeakReady=false;
+#endif
 String url;
 
 #ifdef USE_MQTT
@@ -116,6 +120,11 @@ void startMqttClient()
 #define mqttReady TRUE
 #endif
 
+#ifdef USE_THINGSPEAK
+#else
+#define thingSpeakReady TRUE
+#endif
+
 
 void sleep() {
 	WifiStation.enable(false);
@@ -125,10 +134,12 @@ void sleep() {
 	system_deep_sleep(10*1000000);
 }
 
+#ifdef USE_THINGSPEAK
 void onDataSent(HttpClient& client, bool successful)
 {
 	thingSpeakReady = true;
 }
+#endif
 
 void sendData() {
 
@@ -148,7 +159,7 @@ void sendData() {
 #ifdef USE_MQTT
 	mqttTimer.initializeMs(50,TimerDelegate(&publishMessage)).startOnce();
 #endif
-
+#ifdef USE_THINGSPEAK
 	if (thingSpeak.isProcessing()) return;
 
 #ifdef debug
@@ -166,11 +177,15 @@ void sendData() {
 	url += "&field5=";
 	url += actEnergy;
 	thingSpeak.downloadString(url, onDataSent);
+#endif
 }
 
 void sleepDelay() {
 	if (thingSpeakReady && mqttReady) {
+#ifndef noSleep
 		sleep();
+#endif
+
 	} else {
 		sleepTimer.initializeMs(100,TimerDelegate(&sleepDelay)).startOnce();
 	}
@@ -204,8 +219,10 @@ void readUV(uint newValue, float avgValue, float UVI, float energy)
 		sleep();
 	}
 	else {
+#ifndef noSleep
 		uvSensor->setDelegate(nullptr);
 		uvSensor->stop();
+#endif
 		sendDelay();
 	}
 }
@@ -277,10 +294,11 @@ void init()
 	Wire.pins(2, 0); // SCL, SDA
 
 	Wire.begin();
+	delay(100);
 	uvSensor = new VEML6070(VEML6070Delegate(&readUV),270,1);
 //	uvSensor->setRsetValue(270);
 //	uvSensor->setIntegrationTime(1);
-//	uvSensor->setReduction(1);
+//	uvSensor->setReduction(10);
 //	uvSensor->setAlpha(0.1);
 
 	rst_info *info = system_get_rst_info();
@@ -294,15 +312,18 @@ void init()
 		memset(&rtcMemory,0,sizeof(RTCMemMap));
 	}
 
-
+#ifndef noSleep
 	if (rtcMemory.count == 6) {
+#endif
 		Serial.println("Send to Thingspeak");
 //		WifiStation.config(WIFISSID,WIFIPWD,false);
 		WifiStation.enable(true);
 		measureOnly = false;
 		WifiStation.waitConnection(ConnectionDelegate(&onConnect),10,ConnectionDelegate(&noConnect));
-	} else {
+#ifndef noSleep
+		} else {
 		Serial.println("Measure Only");
 		measureOnly = true;
 	}
+#endif
 }
