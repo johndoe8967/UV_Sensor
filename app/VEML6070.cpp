@@ -29,9 +29,12 @@ VEML6070::VEML6070(VEML6070Delegate newCallbackTimer,uint newRSet, char newTime)
 		value = Wire.read();
 	}
 
-	Wire.beginTransmission(CMDAddress);
-	Wire.write(refreshTime<<2 | 0x02);
-	byte error = Wire.endTransmission();
+	byte error = 1;
+	while (error) {
+		Wire.beginTransmission(CMDAddress);
+		Wire.write(refreshTime<<2 | 0x02);
+		error = Wire.endTransmission();
+	}
 	getCalcRefreshTime();
 	if (error == 0) {
 		init = true;
